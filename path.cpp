@@ -1,6 +1,8 @@
 #include "path.h"
 #include <queue>
 #include <stack>
+#include <iostream>
+#include <string>
 using namespace std;
 
 path::path(const PNG & im, pair<int,int> s, pair<int,int> e)
@@ -14,6 +16,7 @@ void path::BFS(){
 	vector<vector<pair<int,int>>> P(image.height(), vector<pair<int,int>> (image.width(),end));
 
     /* your code here */
+    vector<pair<int,int>> v = neighbors( pair<int,int>(3,4) );
 
 	pathPts = assemble(P,start,end);
 }
@@ -26,7 +29,6 @@ PNG path::render(){
         *imgWithPath.getPixel(pathPts[i].first, pathPts[i].second) = RGBAPixel(255, 0, 0);
     }
     return imgWithPath;
-
 }
 
 vector<pair<int,int>> path::getPath() { return pathPts;}
@@ -73,6 +75,12 @@ vector<pair<int,int>> path::neighbors(pair<int,int> curr) {
     neighbors.push_back(down);
     neighbors.push_back(right);
     neighbors.push_back(up);
+
+    // cout << "current Point: " << curr.first << ", " << curr.second << "\n\n";
+    // cout << "Neighbors:\n"; 
+    // for (unsigned i = 0; i < neighbors.size(); i++) {
+    //     cout << neighbors[i].first << ", " << neighbors[i].second << "\n";
+    // }
 
     return neighbors;
 }
