@@ -45,6 +45,10 @@ private:
     // visited.
 	bool good(vector<vector<bool>> & v, pair<int,int> curr, pair<int,int> next);
 
+    bool withinImg(pair<int,int> & next);
+    bool unvisited(vector< vector<bool> > & v, pair<int,int> & next);
+    bool closeEnough(pair<int,int> & curr, pair<int,int> & next);
+
     // builds a vector containing the locations of the 
     // four vertices adjacent to curr:
     // above, left, right, below (no particular order). 
@@ -69,7 +73,7 @@ private:
     // vector P with P[0] == s.
   
 	vector<pair<int,int>> assemble(vector<vector<pair<int,int>>> & p,
-		pair<int,int> s, pair<int,int> e);
+		                           pair<int,int> s, pair<int,int> e);
 
 
     // tests whether p1 and p2 are near in color. returns 
