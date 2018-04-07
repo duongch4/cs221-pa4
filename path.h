@@ -45,8 +45,9 @@ private:
     // visited.
 	bool good(vector<vector<bool>> & v, pair<int,int> curr, pair<int,int> next);
 
-    bool withinImg(pair<int,int> & next);
-    bool unvisited(vector< vector<bool> > & v, pair<int,int> & next);
+    // 3 Helpers for good()
+    bool withinImg(pair<int,int> & point);
+    bool unvisited(vector< vector<bool> > & v, pair<int,int> & point);
     bool closeEnough(pair<int,int> & curr, pair<int,int> & next);
 
     // builds a vector containing the locations of the 

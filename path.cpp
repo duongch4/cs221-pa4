@@ -16,10 +16,65 @@ void path::BFS(){
 	vector<vector<pair<int,int>>> P(image.height(), vector<pair<int,int>> (image.width(),end));
 
     /* your code here */
-    vector<pair<int,int>> v = neighbors( pair<int,int>(3,4) );
+    queue< pair<int,int> > q;
+    q.push(start);
 
-	pathPts = assemble(P,start,end);
+    while ( !q.empty() ) {
+        pair<int,int> curr = q.front();
+        q.pop();
+        vector< pair<int,int> > adjList = neighbors(curr);
+
+        for (unsigned i = 0; i < adjList.size(); i++) {
+            if ( good(V, curr, adjList[i]) ) {
+                
+                V[ adjList[i].second ][ adjList[i].first ] = true; // set visited to vertex
+                P[ adjList[i].second ][ adjList[i].first ] = curr; // remember the parent/predecessor
+
+                q.push(adjList[i]); // add neighbour to queue
+            }
+        }
+    }
+
+	pathPts = assemble(P,start,end); //provided, do not erase!
 }
+
+vector<pair<int,int>> path::assemble(vector<vector<pair<int,int>>> & p, pair<int,int> s, pair<int,int> e) {
+
+    /* hint, gold code contains the following line:
+	stack<pair<int,int>> S; */
+
+    /* your code here */
+    vector< pair<int,int> > result;
+    stack< pair<int,int> > S;
+
+    // add start point to result
+    result.push_back(s);
+
+    // do something to S
+    while (e != s) {
+        // add e to S
+        S.push(e);
+        // update e:
+        // if e == predecessor of e <=> no path back to s => set e = s to exit loop
+        // else: backtrack to s => update e to be its predecessor 
+        e = (e == p[e.second][e.first])?
+            s : p[e.second][e.first];
+    }
+
+    // No path => return only the start
+    if (S.size() < 2) {
+        return result;
+    }
+
+    // Reverse the order of S if path exists
+    while ( !S.empty() ) {
+        result.push_back(S.top());
+        S.pop();
+    }
+    return result; 
+}
+
+/*===============================================================================*/
 
 PNG path::render(){
 
@@ -31,27 +86,23 @@ PNG path::render(){
     return imgWithPath;
 }
 
-vector<pair<int,int>> path::getPath() { return pathPts;}
-
-int path::length() { return pathPts.size();}
+/*===============================================================================*/
 
 bool path::good(vector<vector<bool>> & v, pair<int,int> curr, pair<int,int> next){
 
     /* your code here */
-    if ( withinImg(next) ) {
-        return ( unvisited(v, next) && closeEnough(curr, next) );
-    } else {
-        return false;
-    }
+    return withinImg(next) 
+           && unvisited(v, next)
+           && closeEnough(curr, next);
 }
 
-bool path::withinImg(pair<int,int> & next) {
-    return 0 <= next.first  && next.first  < (int)image.width() 
-        && 0 <= next.second && next.second < (int)image.height(); 
+bool path::withinImg(pair<int,int> & point) {
+    return 0 <= point.first  && point.first  < (int)image.width() 
+        && 0 <= point.second && point.second < (int)image.height(); 
 }
 
-bool path::unvisited(vector< vector<bool> > & v, pair<int,int> & next) {
-    return !v[next.second][next.first];
+bool path::unvisited(vector< vector<bool> > & v, pair<int,int> & point) {
+    return !v[point.second][point.first];
 }
 
 bool path::closeEnough(pair<int,int> & curr, pair<int,int> & next) {
@@ -59,6 +110,18 @@ bool path::closeEnough(pair<int,int> & curr, pair<int,int> & next) {
     RGBAPixel* pixelNext = image.getPixel(next.first, next.second);
     return closeEnough(*pixelCurr, *pixelNext);
 }
+
+/**
+ * This is given */
+bool path::closeEnough(RGBAPixel p1, RGBAPixel p2){
+   int dist =   (p1.r-p2.r)*(p1.r-p2.r) 
+              + (p1.g-p2.g)*(p1.g-p2.g) 
+              + (p1.b-p2.b)*(p1.b-p2.b);
+
+   return (dist <= 80);
+}
+
+/*===============================================================================*/
 
 vector<pair<int,int>> path::neighbors(pair<int,int> curr) {
 	vector<pair<int,int>> n;
@@ -71,35 +134,16 @@ vector<pair<int,int>> path::neighbors(pair<int,int> curr) {
     pair<int,int> right(curr.first + 1, curr.second);
     pair<int,int> up(curr.first, curr.second - 1);
 
-    neighbors.push_back(left);
-    neighbors.push_back(down);
-    neighbors.push_back(right);
-    neighbors.push_back(up);
-
-    // cout << "current Point: " << curr.first << ", " << curr.second << "\n\n";
-    // cout << "Neighbors:\n"; 
-    // for (unsigned i = 0; i < neighbors.size(); i++) {
-    //     cout << neighbors[i].first << ", " << neighbors[i].second << "\n";
-    // }
+    neighbors[0] = left;
+    neighbors[1] = down;
+    neighbors[2] = right;
+    neighbors[3] = up;
 
     return neighbors;
 }
 
-vector<pair<int,int>> path::assemble(vector<vector<pair<int,int>>> & p, pair<int,int> s, pair<int,int> e) {
+/*============== These are given ================================================*/
 
-    /* hint, gold code contains the following line:
-	stack<pair<int,int>> S; */
+vector<pair<int,int>> path::getPath() { return pathPts; }
 
-    /* your code here */
-    vector< pair<int,int> > vec;
-    vec.push_back(s);
-    return vec;
-}
-
-bool path::closeEnough(RGBAPixel p1, RGBAPixel p2){
-   int dist =   (p1.r-p2.r)*(p1.r-p2.r) 
-              + (p1.g-p2.g)*(p1.g-p2.g) 
-              + (p1.b-p2.b)*(p1.b-p2.b);
-
-   return (dist <= 80);
-}
+int path::length() { return pathPts.size(); }
